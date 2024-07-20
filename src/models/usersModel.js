@@ -5,6 +5,10 @@ const avatarSchema = new Schema({
   url: {
     type: String,
     required: true
+  },
+  code: {
+    type: String,
+    required: true
   }
 });
 

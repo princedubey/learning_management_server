@@ -1,7 +1,7 @@
 import express from "express"
 const router = express.Router()
 
-import { getUserProfile, loginUser, logoutUser, refreshToken, registerUser, requestPasswordReset, resendVerificationCode, resetPassword, verifyEmail } from "../controllers/usersController"
+import { getUserProfile, loginUser, logoutUser, refreshToken, registerUser, requestPasswordReset, resendVerificationCode, resetPassword, updateUserDetails, verifyEmail } from "../controllers/usersController"
 import { authenticateToken } from "../middlewares/authHandler"
 import { 
   registerUserSchema, 
@@ -9,7 +9,9 @@ import {
   resendVerificationCodeSchema, 
   loginUserSchema, 
   requestPasswordResetSchema, 
-  resetPasswordSchema 
+  resetPasswordSchema, 
+  updateUserSchema,
+  updatePasswordSchema
 } from "../validation/usersJoiSchemaValidation";
 
 import { validateSchema } from "../middlewares/validationMiddleware";
@@ -74,6 +76,21 @@ router.get('/profile/:user_id',
   getUserProfile
 )
 
+router.patch('/profile',
+  [
+    authenticateToken,
+    validateSchema(updateUserSchema)
+  ],
+  updateUserDetails
+)
+
+router.patch('/update-password',
+  [
+    authenticateToken,
+    validateSchema(updatePasswordSchema)
+  ],
+  updateUserDetails
+)
 
 
 export default router;

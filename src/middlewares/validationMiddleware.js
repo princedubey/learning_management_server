@@ -10,5 +10,5 @@ export const validateSchema = (schema) => (req, res, next) => {
       message: cleanMessage,
     })
   }
-  next()
+  next();
 }

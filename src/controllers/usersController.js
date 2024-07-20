@@ -1,8 +1,9 @@
-import { generateToken, setTokensInCookies } from "../middlewares/authHandler";
 import usersModel from "../models/usersModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import crypto from "crypto"
+import cloudinary from "cloudinary"
+import { generateToken, setTokensInCookies } from "../middlewares/authHandler";
 import { sendPasswordResetEmail, sendVerificationEmail } from "../utils/mailer";
 import usersMetaDataModel from "../models/usersMetaDataModel";
 
@@ -50,9 +51,6 @@ export const verifyEmail = async (req, res, next) => {
     })
 
     const userMeta = await usersMetaDataModel.findOne({ user_id: user.id })
-
-    console.log(userMeta.email_verification.expiry_date, new Date())
-    console.log(userMeta.email_verification.code, code)
 
     if (userMeta.email_verification.code !== code || new Date() > userMeta.email_verification.expiry_date) {
       return res.status(400).json({ message: "Invalid or expired verification code" })
@@ -159,7 +157,6 @@ export const loginUser = async (req, res, next) => {
 }
 
 export const refreshToken = async (req, res, next) => {
-  console.log(req.cookies.refresh_token)
   const refreshToken = req.cookies.refresh_token;
 
   if (!refreshToken) {
@@ -336,6 +333,62 @@ export const getUserProfile = async (req, res, next) => {
   } catch (error) {
     console.error(error.message);
     next(error)
+  }
+}
+
+export const updateUserDetails = async (req, res, next) => {
+  const { name, email, avatar, current_password: currentPassword, new_password: newPassword } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const user = await usersModel.findById(userId)
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      })
+    }
+
+    if (newPassword) {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: "Current password is incorrect"
+        });
+      }
+    }
+
+    if (name) user.name = name;
+    if (email) {
+      user.email = email
+      user.isVerified = false
+    }
+
+    if (avatar) {
+      if (user.avatar?.code) {
+        await cloudinary.v2.uploader.destroy(user.avatar.code);
+      }
+      const result = await cloudinary.v2.uploader.upload(avatar, { folder: 'avatars', width: 200, height: 200, crop: 'thumb' });
+      user.avatar = {
+        url: result.url,
+        code: result.public_id,
+      }
+    }
+
+    if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
+
+    await user.save();
+    const updatedUser = await usersModel.findById(userId);
+
+    res.status(200).json({
+      success: true,
+      message: "User details updated successfully",
+      data: updatedUser
+    });
+  } catch (error) {
+    console.error(error.message);
+    next(error);
   }
 }
 

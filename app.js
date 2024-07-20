@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import connectDB from "./src/utils/db"
 import errorHandler from "./src/middlewares/errorHandler"
 import router from './src/routes/index'
+import {v2 as cloudenary} from 'cloudinary'
 
 export const app = express()
 require('dotenv').config()
@@ -37,6 +38,12 @@ app.get('*', (req, res)=> {
 })
 
 app.use(errorHandler)
+
+cloudenary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_SECRET_KEY
+})
 
 app.listen(process.env.PORT, () => {
   console.log(`server is running on http://localhost:${process.env.PORT} 🚀`)
