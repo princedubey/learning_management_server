@@ -1,15 +1,21 @@
 import jwt from "jsonwebtoken"
 import usersMetaDataModel from "../models/usersMetaDataModel"
+import usersModel from "../models/usersModel"
 require('dotenv').config()
 
-// Function to generate JWT token
 export const generateToken = (user, type = 'access') => {
   const expiresIn = type === 'access' ? '1h' : '3d'
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn })
+  const userData = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    courses: user.courses,
+  }
+  const token = jwt.sign( userData , process.env.JWT_SECRET, { expiresIn })
   return token;
 }
 
-// Middleware to authenticate JWT token
 export const authenticateToken = (req, res, next) => {
   const token = req.headers.authorization
   if (!token) return res.status(403).json({
@@ -37,7 +43,6 @@ export const authenticateToken = (req, res, next) => {
   })
 }
 
-// Middleware to handle expired JWT tokens
 export const setTokensInCookies = (res, accessToken, refreshToken) => {
   const oneHour = 60 * 60 * 1000;
   const sevenDays = 7 * 24 * 60 * 60 * 1000;
@@ -56,3 +61,15 @@ export const setTokensInCookies = (res, accessToken, refreshToken) => {
     sameSite: 'Strict'
   });
 };
+
+export const authorizeRole = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next({
+        status: 403,
+        message: "Access denied. You don't have access"
+      })
+    }
+    next()
+  }
+}

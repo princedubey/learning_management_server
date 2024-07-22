@@ -2,7 +2,7 @@ import express from "express"
 const router = express.Router()
 
 import { getUserProfile, loginUser, logoutUser, refreshToken, registerUser, requestPasswordReset, resendVerificationCode, resetPassword, updateUserDetails, verifyEmail } from "../controllers/usersController"
-import { authenticateToken } from "../middlewares/authHandler"
+import { authenticateToken, authorizeRole } from "../middlewares/authHandler"
 import { 
   registerUserSchema, 
   verifyEmailSchema, 
@@ -13,7 +13,6 @@ import {
   updateUserSchema,
   updatePasswordSchema
 } from "../validation/usersJoiSchemaValidation";
-
 import { validateSchema } from "../middlewares/validationMiddleware";
 
 router.post('/signup',
@@ -69,9 +68,9 @@ router.get('/logout',
   logoutUser
 )
 
-router.get('/profile/:user_id',
+router.get('/profile',
   [
-    authenticateToken
+    authenticateToken,
   ],
   getUserProfile
 )
@@ -79,7 +78,7 @@ router.get('/profile/:user_id',
 router.patch('/profile',
   [
     authenticateToken,
-    validateSchema(updateUserSchema)
+    validateSchema(updateUserSchema),
   ],
   updateUserDetails
 )

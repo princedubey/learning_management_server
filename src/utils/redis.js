@@ -1,4 +1,4 @@
-import { Redis } from "ioredis";
+import Redis from "ioredis";
 require('dotenv').config()
 
 const redisClient = () => {
@@ -10,4 +10,6 @@ const redisClient = () => {
   return process.env.REDIS_URL
 }
 
-export const redis = new Redis(redisClient());
+const redis = new Redis(redisClient())
+
+export default redis

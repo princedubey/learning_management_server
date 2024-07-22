@@ -46,3 +46,22 @@ export const sendPasswordResetEmail = async (to, resetToken) => {
     console.error('Error sending email:', error);
   }
 };
+
+// Send question reply notification mail
+export const sendQuestionReplyNotificationEmail = async (to, name, title) => {
+  try {
+    const templatePath = path.resolve('src', 'helpers', 'question_reply_template.ejs');
+    const html = await ejs.renderFile(templatePath, { name, title });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to,
+      subject: 'New Question Reply',
+      html
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};

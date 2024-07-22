@@ -322,7 +322,7 @@ export const logoutUser = async (req, res, next) => {
 
 export const getUserProfile = async (req, res, next) => {
   try {
-    const user = await usersModel.findById(req.user.id);
+    const user = await usersModel.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.status(200).json({
