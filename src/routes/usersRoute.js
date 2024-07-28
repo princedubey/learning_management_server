@@ -1,7 +1,7 @@
 import express from "express"
 const router = express.Router()
 
-import { getUserProfile, loginUser, logoutUser, refreshToken, registerUser, requestPasswordReset, resendVerificationCode, resetPassword, updateUserDetails, verifyEmail } from "../controllers/usersController"
+import { getAllUsers, getUserProfile, loginUser, logoutUser, refreshToken, registerUser, requestPasswordReset, resendVerificationCode, resetPassword, updateUserDetails, verifyEmail } from "../controllers/usersController"
 import { authenticateToken, authorizeRole } from "../middlewares/authHandler"
 import { 
   registerUserSchema, 
@@ -89,6 +89,15 @@ router.patch('/update-password',
     validateSchema(updatePasswordSchema)
   ],
   updateUserDetails
+)
+
+// Admin routes only accessible by admin users
+router.get('/all-users', 
+  [
+    authenticateToken,
+    authorizeRole('admin')
+  ],
+  getAllUsers
 )
 
 

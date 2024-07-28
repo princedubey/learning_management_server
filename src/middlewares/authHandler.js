@@ -5,19 +5,15 @@ require('dotenv').config()
 
 export const generateToken = (user, type = 'access') => {
   const expiresIn = type === 'access' ? '1h' : '3d'
-  const userData = {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    courses: user.courses,
-  }
-  const token = jwt.sign( userData , process.env.JWT_SECRET, { expiresIn })
+  
+  const token = jwt.sign( {_id: user._id} , process.env.JWT_SECRET, { expiresIn })
   return token;
 }
 
 export const authenticateToken = (req, res, next) => {
-  const token = req.headers.authorization
+  let token = req.headers.authorization
+  token = req.cookies.access_token
+
   if (!token) return res.status(403).json({
     success: false,
     message: "Access denied. No token provided."
@@ -37,6 +33,8 @@ export const authenticateToken = (req, res, next) => {
         message: 'Invalid or expired access token' 
       });
     }
+
+    user = await usersModel.findById(user._id)
 
     req.user = user
     next()

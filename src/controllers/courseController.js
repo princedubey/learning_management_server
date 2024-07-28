@@ -4,8 +4,9 @@ import courseServiceProvider from "../services/courseServiceProvider";
 import redis from '../utils/redis'
 import usersModel from "../models/usersModel";
 import { sendQuestionReplyNotificationEmail } from "../utils/mailer";
+import notificationsModel from "../models/notificationsModel";
 
-export const createCourse = async (req, res, next) => {
+export const createCourseAdmin = async (req, res, next) => {
   try {
     const data = req.body
 
@@ -33,8 +34,7 @@ export const createCourse = async (req, res, next) => {
 }
 
 //update course
-
-export const updateCourse = async (req, res, next) => {
+export const updateCourseAdmin = async (req, res, next) => {
   try {
     const data = req.body
     const courseId = req.params.course_id
@@ -85,7 +85,7 @@ export const getSingleCourse = async (req, res, next) => {
     const select = "-course_data.video_url -course_data.suggestion -course_data.questions -course_data.links"
     const course = await courseServiceProvider.getCourseById(courseId ,select)
 
-    await redis.set(courseId, JSON.stringify(course))
+    await redis.set(courseId, JSON.stringify(course), 'EX', 604800) // 7 days expiration
 
     res.status(200).json({
       success: true,
@@ -230,9 +230,12 @@ export const giveReplyToQuestion = async (req, res, next) => {
     await course.save()
 
     if(userId === question.user_id) {
-      // SEND NOTIFICATION
+      await notificationsModel.create({
+        user_id: userId,
+        title: "comment",
+        message: `${req.user.name} has replied to your question on ${courseContent.title}`,
+      })
     } else {
-      // SEND MAIL
       await sendQuestionReplyNotificationEmail(question.user_id.email, question.user_id.name, courseContent.title)
     }
 
@@ -278,11 +281,12 @@ export const addReviewToCourse = async (req, res, next) => {
     await existingCourse.save()
 
     const NOTIFICATION = {
-      title: "New review added",
-      content: `User ${userName} has added a new review for ${existingCourse.name}`,
+      user_id: req.user._id,
+      title: "review",
+      message: `User ${userName} has added a new review for ${existingCourse.name}`,
     }
 
-    // letter need to add notification
+    await notificationsModel.create(NOTIFICATION)
 
     res.status(200).json({
       success: true,
@@ -323,12 +327,13 @@ export const addReplyToReview = async (req, res, next) => {
     await course.save()
     
     const NOTIFICATION = {
-      title: "New reply added",
-      content: `User ${name} has added a new reply for review on ${course.name}`,
+      user_id: userId,
+      title: "review",
+      message: `User ${name} has added a new reply for review on ${course.name}`,
     }
-    
-    // letter need to add notification
-    
+
+    await notificationsModel.create(NOTIFICATION)
+        
     res.status(200).json({
       success: true,
       message: "Reply added successfully",
@@ -337,5 +342,45 @@ export const addReplyToReview = async (req, res, next) => {
   } catch (err) {
     console.error(err.message);
     return next(err);
+  }
+}
+
+// Get all courses --- admin
+export const getAllCoursesAdmin = async (req, res, next) => {
+  try {
+    const courses = await courseServiceProvider.getAllCourses({})
+
+    res.status(200).json({
+      success: true,
+      message: "Courses fetched successfully",
+      data: courses,
+    })
+  } catch (error) {
+    console.error(error.message);
+    next(error)
+  }
+}
+
+// Delete course --- admin
+export const deleteCourseAdmin = async (req, res, next) => {
+  try {
+    const courseId = req.params.course_id
+
+    const course = await courseServiceProvider.deleteCourse(courseId)
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Course deleted successfully",
+    })
+  } catch (error) {
+    console.error(error.message);
+    next(error)
   }
 }

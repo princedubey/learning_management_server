@@ -1,63 +1,32 @@
 import Joi from 'joi';
+import JoiObjectId from 'joi-objectid';
 
-// Define nested schemas
-const reviewSchema = Joi.object({
-  user_id: Joi.string().required(),
-  rating: Joi.number().min(0).max(5).default(0),
-  comment: Joi.string().optional()
-});
+Joi.objectId = JoiObjectId(Joi);
 
-const linkSchema = Joi.object({
-  title: Joi.string().required(),
-  url: Joi.string().uri().required()
-});
-
-const commentSchema = Joi.object({
-  user_id: Joi.string().required(),
-  comment: Joi.string().required(),
-  comment_replies: Joi.array().items(Joi.object({
-    user_id: Joi.string().required(),
-    comment: Joi.string().required()
-  })).optional()
-});
-
-const courseDataSchema = Joi.object({
-  video_url: Joi.string().uri().required(),
-  video_thumbnail: Joi.object({
-    public_id: Joi.string().required(),
-    url: Joi.string().uri().required()
-  }).required(),
-  title: Joi.string().required(),
-  video_section: Joi.string().required(),
-  description: Joi.string().required(),
-  video_length: Joi.number().min(0).required(),
-  video_player: Joi.string().required(),
-  links: Joi.array().items(linkSchema).optional(),
-  suggestion: Joi.string().optional(),
-  questions: Joi.array().items(commentSchema).optional()
-});
-
-// Main course schema
 export const createCourseSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),
   price: Joi.number().required(),
   estimated_price: Joi.number().optional(),
   thumbnail: Joi.string().uri().optional(),
-  tags: Joi.array().items(Joi.string().required()).required(),
+  tags: Joi.array().items(Joi.string()).required(),
   level: Joi.string().required(),
   demo_url: Joi.string().uri().required(),
-  benefits: Joi.array().items(Joi.object({
-    title: Joi.string().required()
-  })).optional(),
-  pre_requisites: Joi.array().items(Joi.object({
-    title: Joi.string().required()
-  })).optional(),
-  reviews: Joi.array().items(reviewSchema).optional(),
-  course_data: Joi.array().items(courseDataSchema).optional(),
-  ratings: Joi.number().min(0).max(5).default(0).optional(),
-  total_purchase: Joi.number().min(0).default(0).optional()
-})
+  benefits: Joi.array().items(Joi.object({ title: Joi.string().required() })).optional(),
+  pre_requisites: Joi.array().items(Joi.object({ title: Joi.string().required() })).optional(),
+  course_data: Joi.array().items(Joi.object({
+    video_url: Joi.string().uri().optional(),
+    video_thumbnail: Joi.object().optional(),
+    title: Joi.string().required(),
+    video_section: Joi.string().optional(),
+    description: Joi.string().optional(),
+    video_length: Joi.number().optional(),
+    video_player: Joi.string().optional(),
+    links: Joi.array().items(Joi.object({ title: Joi.string().required(), url: Joi.string().uri().required() })).optional(),
+    suggestion: Joi.string().optional(),
+    questions: Joi.array().items(Joi.object({ user_id: Joi.objectId().required(), question: Joi.string().required(), replies: Joi.array().optional() })).optional(),
+  })).optional()
+});
 
 export const updateCourseSchema = Joi.object({
   name: Joi.string().optional(),
@@ -65,17 +34,44 @@ export const updateCourseSchema = Joi.object({
   price: Joi.number().optional(),
   estimated_price: Joi.number().optional(),
   thumbnail: Joi.string().uri().optional(),
-  tags: Joi.array().items(Joi.string().optional()).optional(),
+  tags: Joi.array().items(Joi.string()).optional(),
   level: Joi.string().optional(),
   demo_url: Joi.string().uri().optional(),
-  benefits: Joi.array().items(Joi.object({
-    title: Joi.string().optional()
-  })).optional(),
-  pre_requisites: Joi.array().items(Joi.object({
-    title: Joi.string().optional()
-  })).optional(),
-  reviews: Joi.array().items(reviewSchema).optional(),
-  course_data: Joi.array().items(courseDataSchema).optional(),
-  ratings: Joi.number().min(0).max(5).optional(),
-  total_purchase: Joi.number().min(0).optional()
+  benefits: Joi.array().items(Joi.object({ title: Joi.string().required() })).optional(),
+  pre_requisites: Joi.array().items(Joi.object({ title: Joi.string().required() })).optional(),
+  course_data: Joi.array().items(Joi.object({
+    video_url: Joi.string().uri().optional(),
+    video_thumbnail: Joi.object().optional(),
+    title: Joi.string().optional(),
+    video_section: Joi.string().optional(),
+    description: Joi.string().optional(),
+    video_length: Joi.number().optional(),
+    video_player: Joi.string().optional(),
+    links: Joi.array().items(Joi.object({ title: Joi.string().optional(), url: Joi.string().uri().optional() })).optional(),
+    suggestion: Joi.string().optional(),
+    questions: Joi.array().items(Joi.object({ user_id: Joi.objectId().optional(), question: Joi.string().optional(), replies: Joi.array().optional() })).optional(),
+  })).optional()
+});
+
+export const addQuestionSchema = Joi.object({
+  question: Joi.string().required(),
+  course_id: Joi.objectId().required(),
+  content_id: Joi.objectId().required()
+});
+
+export const addReplySchema = Joi.object({
+  answer: Joi.string().required(),
+  course_id: Joi.objectId().required(),
+  content_id: Joi.objectId().required(),
+  question_id: Joi.objectId().required()
+});
+
+export const addReviewSchema = Joi.object({
+  review: Joi.string().required(),
+  rating: Joi.number().min(0).max(5).required()
+});
+
+export const addReviewReplySchema = Joi.object({
+  review_id: Joi.objectId().required(),
+  reply: Joi.string().required()
 });

@@ -3,7 +3,7 @@ import coursesModel from "../models/coursesModel";
 // Get all courses
 class courseDataServiceProvider {
 
-  async getAllCourses({ query = {}, sort=null, limit=null, select=null, lean = false }) {
+  async getAllCourses({ query = {}, sort= {created_at: -1}, limit=null, select=null, lean = false }) {
     const courses = await coursesModel.find(query).select(select).sort(sort).limit(limit)
     return courses;
   }

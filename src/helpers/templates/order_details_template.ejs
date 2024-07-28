@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Receipt</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #dddddd;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #333333;
+    }
+    .order-details {
+      margin: 20px 0;
+    }
+    .order-details h2 {
+      font-size: 20px;
+      color: #333333;
+      margin-bottom: 10px;
+    }
+    .order-details p {
+      margin: 5px 0;
+      color: #555555;
+    }
+    .footer {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #dddddd;
+    }
+    .footer p {
+      margin: 0;
+      font-size: 14px;
+      color: #999999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Order Receipt</h1>
+    </div>
+    <div class="order-details">
+      <h2>Thank you for your order!</h2>
+      <p><strong>Course Name:</strong> <%= course %></p>
+      <p><strong>Price:</strong> $<%= price %></p>
+      <p><strong>Order ID:</strong> <%= order_id %></p>
+      <p><strong>Date:</strong> <%= date %></p>
+      <p><strong>Status:</strong> <%= status %></p>
+    </div>
+    <div class="footer">
+      <p>If you have any questions, feel free to contact us.</p>
+    </div>
+  </div>
+</body>
+</html>

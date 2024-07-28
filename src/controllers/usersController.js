@@ -6,6 +6,7 @@ import cloudinary from "cloudinary"
 import { generateToken, setTokensInCookies } from "../middlewares/authHandler";
 import { sendPasswordResetEmail, sendVerificationEmail } from "../utils/mailer";
 import usersMetaDataModel from "../models/usersMetaDataModel";
+import usersServiceProvider from "../services/usersServiceProvider";
 
 //register users
 export const registerUser = async (req, res, next) => {
@@ -409,4 +410,20 @@ const saveUserMetaData = async (email) => {
   )
 
   return verificationCode;
+}
+
+// Get all users ---- admin
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await usersServiceProvider.getAllUsers({})
+
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: users
+    });
+  } catch (error) {
+    console.error(error.message);
+    next(error);
+  }
 }
