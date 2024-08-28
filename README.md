@@ -63,6 +63,7 @@ Ensure you have the following installed:
 
 3. **Set up environment variables:**
     ```sh
+    EXAMPLE_________________________________
     PORT = 3000
     VERSION = v1
     NODE_ENV = DEV
