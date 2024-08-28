@@ -28,7 +28,7 @@ app.get('/health', (req, res)=> {
   })
 })
 
-app.use(`/lms/${process.env.VERSION}`, router)
+app.use(`/${process.env.VERSION}`, router)
 
 app.get('*', (req, res)=> {
   res.status(404).json({
@@ -49,7 +49,7 @@ cloudinary.config({
 //   console.log(`server is running on http://localhost:${process.env.PORT} 🚀`)
 // })
 
-// Export the app wrapped in a serverless function
+//  Vercel: Deployment config
 export default (req, res) => {
   return app(req, res);
 };
