@@ -45,6 +45,11 @@ cloudinary.config({
   api_secret: process.env.CLOUD_SECRET_KEY
 })
 
-app.listen(process.env.PORT, () => {
-  console.log(`server is running on http://localhost:${process.env.PORT} 🚀`)
-})
+// app.listen(process.env.PORT, () => {
+//   console.log(`server is running on http://localhost:${process.env.PORT} 🚀`)
+// })
+
+// Export the app wrapped in a serverless function
+export default (req, res) => {
+  return app(req, res);
+};
