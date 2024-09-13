@@ -61,7 +61,7 @@ router.post('/forget-password',
   resetPassword
 )
 
-router.get('/logout',
+router.post('/logout',
   [
     authenticateToken
   ],
