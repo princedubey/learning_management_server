@@ -300,6 +300,7 @@ export const logoutUser = async (req, res, next) => {
     const userId = req.user._id;
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
+    res.clearCookie('is_auth')
 
     await usersMetaDataModel.findOneAndUpdate(
       { user_id: userId },
