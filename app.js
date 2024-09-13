@@ -15,7 +15,8 @@ app.use(cookieParser())
 app.use(morgan('dev'))
 app.use(cors({
   origin: process.env.ORIGIN,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  credentials: true,
 }))
 
 // Database connection
