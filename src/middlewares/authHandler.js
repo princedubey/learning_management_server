@@ -47,16 +47,22 @@ export const setTokensInCookies = (res, accessToken, refreshToken) => {
 
   res.cookie('access_token', accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'PROD',
+    secure: true,
     maxAge: oneHour,
     sameSite: 'Strict'
   });
 
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'PROD',
+    secure: true,
     maxAge: sevenDays,
     sameSite: 'Strict'
+  });
+
+  res.cookie('is_auth', true, {
+    httpOnly: false,
+    secure: false,
+    maxAge: sevenDays,
   });
 };
 
