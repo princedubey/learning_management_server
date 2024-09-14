@@ -61,7 +61,7 @@ export const setTokensInCookies = (res, accessToken, refreshToken) => {
 
   res.cookie('is_auth', true, {
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'PROD',
+    secure: false,
     maxAge: sevenDays,
   });
 };
