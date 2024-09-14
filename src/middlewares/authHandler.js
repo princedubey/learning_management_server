@@ -51,21 +51,21 @@ export const setTokensInCookies = (res, accessToken, refreshToken) => {
     httpOnly: true,
     secure: isProd,
     maxAge: oneHour, 
-    // sameSite: 'Lax', // Consider 'Lax' if you need cross-site usage
+    sameSite: 'None',
   });
 
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true,
     secure: isProd,
     maxAge: sevenDays,
-    // sameSite: 'Lax', // Consider 'Lax' if you need cross-site usage
+    sameSite: 'None',
   });
 
   res.cookie('is_auth', true, {
-    httpOnly: false, // Client needs access to this cookie
-    secure: isProd,
+    httpOnly: false,
+    secure: false,
     maxAge: sevenDays,
-    // sameSite: 'Lax', // Adjust based on your requirements
+    sameSite: 'None',
   });
 };
 
