@@ -45,27 +45,30 @@ export const setTokensInCookies = (res, accessToken, refreshToken) => {
   const oneHour = 60 * 60 * 1000; // 1 hour
   const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-  const isProd = process.env.NODE_ENV === 'production'; // use 'production' instead of 'PROD'
+  const isProd = process.env.NODE_ENV === 'production'; // Will be 'production' on Vercel
 
+  // Set Access Token (valid for 1 hour)
   res.cookie('access_token', accessToken, {
-    httpOnly: true,
-    secure: isProd,
+    httpOnly: true, // not accessible by JS
+    secure: isProd ? true : false, // only sent over HTTPS in production, false in dev
     maxAge: oneHour, 
-    sameSite: 'None',
+    sameSite: 'None', // for cross-origin, even on localhost
   });
 
+  // Set Refresh Token (valid for 7 days)
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true,
-    secure: isProd,
+    secure: isProd ? true : false, // secure in production
     maxAge: sevenDays,
-    sameSite: 'None',
+    sameSite: 'None', // needed for cross-origin
   });
 
+  // Set Authentication Status Cookie (accessible by JS)
   res.cookie('is_auth', true, {
-    httpOnly: false,
-    secure: false,
+    httpOnly: false, // accessible by JS
+    secure: isProd ? true : false,  // secure in production, false in dev
     maxAge: sevenDays,
-    sameSite: 'None',
+    sameSite: 'None', // for cross-origin cookies
   });
 };
 
